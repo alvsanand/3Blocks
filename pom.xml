@@ -1,128 +1,50 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.alvsanand</groupId>
   <artifactId>3Blocks</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <version>0.1</version>
+  <packaging>apk</packaging>
   <name>3Blocks</name>
-  <description>3 Tetris games like</description>
 
-    <properties>
-        <!-- set a custom format that is guaranteed to grow as a Long number, so it can be used as version code
-        in the AndroidManifest.xml -->
-        <maven.build.timestamp.format>yyMMdddHHmm</maven.build.timestamp.format>
-        <!-- this trick of loading build timestamp into other property is necessary due to
-        http://jira.codehaus.org/browse/MRESOURCES-99 and also more readable -->
-        <versionCode>${maven.build.timestamp}</versionCode>
-    </properties>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.8.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.android</groupId>
-                <artifactId>android</artifactId>
-                <version>2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.android</groupId>
-                <artifactId>android-test</artifactId>
-                <version>2.2</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
+      <version>2.2.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 
-    <build>
-        <sourceDirectory>src</sourceDirectory>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <!-- version 2.3 defaults to java 1.5, so no further configuration needed-->
-                    <version>2.3</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-jarsigner-plugin</artifactId>
-                    <version>1.2</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.4.3</version>
-                    <configuration>
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                </plugin>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+        <artifactId>maven-android-plugin</artifactId>
+        <version>2.8.4</version>
+        <configuration>
+          <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+          <assetsDirectory>${project.basedir}/assets</assetsDirectory>
+          <resourceDirectory>${project.basedir}/res</resourceDirectory>
+          <nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+          <sdk>
+            <platform>8</platform>
+          </sdk>
+          <deleteConflictingFiles>true</deleteConflictingFiles>
+          <undeployBeforeDeploy>true</undeployBeforeDeploy>
+        </configuration>
+        <extensions>true</extensions>
+      </plugin>
 
-                <plugin>
-                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                    <artifactId>maven-android-plugin</artifactId>
-                    <version>2.8.4</version>
-                    <configuration>
-                        <sdk>
-                            <platform>9</platform>
-                        </sdk>
-                        <emulator>
-                            <avd>23</avd>
-                            <wait>10000</wait>
-                            <!--<options>-no-skin</options>-->
-                        </emulator>
-                        <zipalign>
-                            <verbose>true</verbose>
-                        </zipalign>
-                        <deleteConflictingFiles>true</deleteConflictingFiles>
-                        <undeployBeforeDeploy>true</undeployBeforeDeploy>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>com.pyx4me</groupId>
-                    <artifactId>proguard-maven-plugin</artifactId>
-                    <version>2.0.4</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.0-beta-4</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-
-    <profiles>
-        <profile>
-            <!-- the standard profile runs the instrumentation tests -->
-            <id>standard</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>morse-lib</module>
-                <module>morseflash-app</module>
-                <module>morseflash-instrumentation</module>
-            </modules>
-        </profile>
-        <profile>
-            <!-- the release profile does sign, proguard, zipalign ... but does not run instrumentation tests -->
-            <id>release</id>
-            <!-- via this activation the profile is automatically used when the release is done with the maven release
-            plugin -->
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <modules>
-                <module>morse-lib</module>
-                <module>morseflash-app</module>
-            </modules>
-        </profile>
-    </profiles>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
