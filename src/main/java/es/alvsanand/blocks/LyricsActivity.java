@@ -1,6 +1,8 @@
-package es.alvsanand.Blocks;
+package es.alvsanand.blocks;
 
 import java.io.IOException;
+
+import es.alvsanand.blocks.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
