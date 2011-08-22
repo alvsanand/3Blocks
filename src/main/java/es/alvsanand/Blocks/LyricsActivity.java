@@ -56,11 +56,10 @@ public class LyricsActivity extends Activity {
 			alertDialog.show();
 
 			alertDialog.setOnKeyListener(new OnKeyListener() {
-				public boolean onKey(DialogInterface dialog, int keyCode,
-						KeyEvent event) {
-					if (keyCode == KeyEvent.KEYCODE_BACK) {						
+				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+					if (keyCode == KeyEvent.KEYCODE_BACK) {
 						dialog.dismiss();
-						
+
 						return true;
 					}
 
@@ -74,22 +73,55 @@ public class LyricsActivity extends Activity {
 		}
 	}
 
-	public void playHandler(View view) {
+	public void playHandler(final View view) {
 		switch (view.getId()) {
 		case R.id.layout_main_button_player:
 			if (mMediaPlayer == null) {
+				Log.i(TAG, "Playback initialized");
+				
 				Button button = (Button) findViewById(view.getId());
-				button.setText(R.string.button_stop);
+				button.setText(R.string.button_pause);
 
 				mMediaPlayer = MediaPlayer.create(this, R.raw.music);
 				mMediaPlayer.start();
+
+				mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+					public void onCompletion(MediaPlayer mp) {
+						Log.i(TAG, "Playback completed");
+
+						Button button = (Button) findViewById(view.getId());
+						button.setText(R.string.button_play);
+						
+						try {
+							mMediaPlayer.seekTo(0);
+						} catch (IllegalStateException e) {
+							Log.e(TAG, "Error initialiting playback", e);
+						}
+					}
+				});
 			} else {
 				Button button = (Button) findViewById(view.getId());
-				button.setText(R.string.button_play);
 
-				mMediaPlayer.release();
+				if (button.getText().equals(getText(R.string.button_pause))) {
+					Log.i(TAG, "Playback paused");
 
-				mMediaPlayer = null;
+					button.setText(R.string.button_resume);
+
+					mMediaPlayer.pause();
+				} else {
+					if (button.getText().equals(getText(R.string.button_resume))) {
+						Log.i(TAG, "Playback resumed");
+						button.setText(R.string.button_pause);
+
+						mMediaPlayer.start();
+					} else {
+						Log.i(TAG, "Playback started");
+
+						button.setText(R.string.button_pause);
+
+						mMediaPlayer.start();
+					}
+				}
 			}
 
 			break;
