@@ -1,9 +1,12 @@
 package es.alvsanand.Blocks;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -78,12 +81,25 @@ public class LyricsActivity extends Activity {
 		case R.id.layout_main_button_player:
 			if (mMediaPlayer == null) {
 				Log.i(TAG, "Playback initialized");
-				
+
 				Button button = (Button) findViewById(view.getId());
 				button.setText(R.string.button_pause);
 
-				mMediaPlayer = MediaPlayer.create(this, R.raw.music);
-				mMediaPlayer.start();
+				try {
+					AssetFileDescriptor assetFileDescriptor = getAssets().openFd("music.mp3");
+
+					mMediaPlayer = new MediaPlayer();
+					mMediaPlayer.setDataSource(assetFileDescriptor.getFileDescriptor(), assetFileDescriptor.getStartOffset(),
+							assetFileDescriptor.getLength());
+					mMediaPlayer.prepare();
+					mMediaPlayer.start();
+				} catch (IllegalArgumentException e) {
+					Log.e(TAG, "Error initialiting playback", e);
+				} catch (IllegalStateException e) {
+					Log.e(TAG, "Error initialiting playback", e);
+				} catch (IOException e) {
+					Log.e(TAG, "Error initialiting playback", e);
+				}
 
 				mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 					public void onCompletion(MediaPlayer mp) {
@@ -91,7 +107,7 @@ public class LyricsActivity extends Activity {
 
 						Button button = (Button) findViewById(view.getId());
 						button.setText(R.string.button_play);
-						
+
 						try {
 							mMediaPlayer.seekTo(0);
 						} catch (IllegalStateException e) {
